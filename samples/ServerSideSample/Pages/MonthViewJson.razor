@@ -8,56 +8,13 @@
 
 @code {
     public CalendarSettings calendarSettings { get; set; }  = new CalendarSettings()
+    {
+        plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
+        defaultView = "dayGridWeek",
+        timeZone = "UTC",
+        eventSources = new List<CalendarSourceFeed>()
         {
-            plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
-            defaultView = "dayGridWeek",
-            timeZone = "UTC",
-            //header = new CalendarHeader()
-            //{
-            //    left = "title",
-            //    center = "",
-            //    right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
-            //},
-            //views = new Dictionary<string, CalendarViewDefinition>()
-            //{
-            //    { "dayGridOneWeek", CalendarViewDefinition.DayGridWeeks(1,"One Week") },
-            //    { "dayGridTwoWeeks", CalendarViewDefinition.DayGridWeeks(2,"Two Weeks") },
-            //    { "dayGridTwoMonths", CalendarViewDefinition.DayGridMonths(2,"Two Months") },
-            //},
-            eventSources = new List<CalendarSourceFeed>()
-            {
-                new CalendarSourceFeed() { url = "https://fullcalendar.io/demo-events.json", extraParams = new Dictionary<string, string>(){ { "custom","dummy"} } }
-            }
-            //events = GetRandomEvents(10).ToArray()
-        };
-
-    //protected override void OnInitialized()
-    //{
-    //    calendarSettings = new CalendarSettings()
-    //    {
-    //        plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
-    //        defaultView = "dayGridWeek",
-    //        timeZone = "UTC",
-    //        //header = new CalendarHeader()
-    //        //{
-    //        //    left = "title",
-    //        //    center = "",
-    //        //    right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
-    //        //},
-    //        //views = new Dictionary<string, CalendarViewDefinition>()
-    //        //{
-    //        //    { "dayGridOneWeek", CalendarViewDefinition.DayGridWeeks(1,"One Week") },
-    //        //    { "dayGridTwoWeeks", CalendarViewDefinition.DayGridWeeks(2,"Two Weeks") },
-    //        //    { "dayGridTwoMonths", CalendarViewDefinition.DayGridMonths(2,"Two Months") },
-    //        //},
-    //        eventSources = new List<CalendarSourceFeed>()
-    //        {
-    //            new CalendarSourceFeed() { url = "https://fullcalendar.io/demo-events.json", extraParams = new Dictionary<string, string>(){ { "custom","dummy"} } }
-    //        }
-    //        //events = GetRandomEvents(10).ToArray()
-    //    };
-    //}
-
-
-
+            new CalendarSourceFeed() { url = "https://fullcalendar.io/demo-events.json", extraParams = new Dictionary<string, string>(){ { "custom","dummy"} } }
+        }
+    };
 }
