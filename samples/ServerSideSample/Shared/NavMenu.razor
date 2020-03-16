@@ -1,0 +1,28 @@
+﻿    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">BlazorFullCalendar</a>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="/">Home <span class="sr-only">(current)</span></a>
+                <NavLink class="nav-link" href="/monthviewjson" Match="NavLinkMatch.All">
+                    Month View (JSON)
+                </NavLink>
+                <NavLink class="nav-link" href="/monthviewarray" Match="NavLinkMatch.All">
+                    Month View (Array)
+                </NavLink>
+                <NavLink class="nav-link" href="/events" Match="NavLinkMatch.All">
+                    Event View (Array)
+                </NavLink>
+            </div>
+        </div>
+    </nav>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
