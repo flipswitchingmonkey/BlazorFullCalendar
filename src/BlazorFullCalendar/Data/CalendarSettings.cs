@@ -8,18 +8,38 @@ namespace BlazorFullCalendar.Data
 {
     public class CalendarSettings
     {
-        public string schedulerLicenseKey { get; set; } = "GPL-My-Project-Is-Open-Source";
-        public string defaultView { get; set; }
-        public string[] plugins { get; set; }
-        public bool? refetchResourcesOnNavigate { get; set; }
-        public bool? editable { get; set; } = false;
-        public bool? droppable { get; set; } = false;
+        [JsonProperty("schedulerLicenseKey")]
+        public string SchedulerLicenseKey { get; set; } = "CC-Attribution-NonCommercial-NoDerivatives";
+
+        [JsonProperty("initialView")]
+        public string InitialView { get; set; }
+
+        [JsonProperty("plugins")]
+        public string[] Plugins { get; set; }
+
+        [JsonProperty("refetchResourcesOnNavigate")]
+        public bool? RefetchResourcesOnNavigate { get; set; }
+
+        [JsonProperty("editable")]
+        public bool? Editable { get; set; } = false;
+
+        [JsonProperty("droppable")]
+        public bool? Droppable { get; set; } = false;
 
         //Allow events’ start times to be editable through dragging.
-        public bool? eventStartEditable { get; set; }
-        public bool? eventResizableFromStart { get; set; }
-        public bool? eventDurationEditable { get; set; } 
-        public bool? eventResourceEditable { get; set; }
+        [JsonProperty("eventStartEditable")]
+        public bool? EventStartEditable { get; set; }
+
+        [JsonProperty("eventResizableFromStart")]
+        public bool? EventResizableFromStart { get; set; }
+
+        [JsonProperty("eventDurationEditable")]
+        public bool? EventDurationEditable { get; set; }
+
+        [JsonProperty("eventResourceEditable")]
+        public bool? EventResourceEditable { get; set; }
+
+        public string themeSystem { get; set; } = "standard";
 
         //Called when an external draggable element or an event from another calendar has 
         //been dropped onto the calendar.
@@ -56,7 +76,7 @@ namespace BlazorFullCalendar.Data
         public int firstDay { get; set; }
         public CalendarDurationObject minTime { get; set; }
         public CalendarDurationObject maxTime { get; set; }
-        public CalendarHeader header { get; set; }
+        public CalendarHeader headerToolbar { get; set; }
         //public Dictionary<string, int> duration { get; set; }
         public CalendarDurationObject duration { get; set; }
         public CalendarDateFormatter[] slotLabelFormat { get; set; }

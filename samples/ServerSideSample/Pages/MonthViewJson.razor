@@ -9,8 +9,8 @@
 @code {
     public CalendarSettings calendarSettings { get; set; }  = new CalendarSettings()
     {
-        plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
-        defaultView = "dayGridWeek",
+        Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
+        InitialView = "dayGridWeek",
         timeZone = "UTC",
         eventSources = new List<CalendarSourceFeed>()
         {

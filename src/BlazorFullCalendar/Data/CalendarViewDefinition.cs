@@ -12,11 +12,11 @@ namespace BlazorFullCalendar.Data
         public CalendarDurationObject duration { get; set; }
         public CalendarDateFormatter[] slotLabelFormat { get; set; }
         public CalendarDurationObject slotLabelInterval { get; set; }
-        public CalendarDateFormatter columnHeaderFormat { get; set; }
+        public CalendarDateFormatter dayHeaderFormat { get; set; }
         public bool? allDaySlot { get; set; }
         public string allDayText { get; set; }
-        public CalendarDurationObject minTime { get; set; }
-        public CalendarDurationObject maxTime { get; set; }
+        public CalendarDurationObject slotMinTime { get; set; }
+        public CalendarDurationObject slotMaxTime { get; set; }
 
         public CalendarViewDefinition() { }
 
@@ -27,7 +27,7 @@ namespace BlazorFullCalendar.Data
             buttonText = viewButtonText;
             duration = viewDuration;
             slotLabelFormat = slotLabelFormatDefault;
-            columnHeaderFormat = columnHeaderFormatDefault;
+            dayHeaderFormat = columnHeaderFormatDefault;
         }
 
         public static CalendarViewDefinition DayGridWeeks(int numberOfWeeks, string label="Weeks", CalendarDateFormatter[] slotLabelFormatDefault = null, CalendarDateFormatter columnHeaderFormatDefault = null) 
@@ -37,7 +37,7 @@ namespace BlazorFullCalendar.Data
             buttonText = label,
             duration = CalendarDurationObject.Weeks(numberOfWeeks),
             slotLabelFormat = slotLabelFormatDefault,
-            columnHeaderFormat = columnHeaderFormatDefault
+            dayHeaderFormat = columnHeaderFormatDefault
         };
 
         public static CalendarViewDefinition DayGridMonths(int numberOfMonths, string label = "Months", CalendarDateFormatter[] slotLabelFormatDefault = null, CalendarDateFormatter columnHeaderFormatDefault = null)
@@ -47,7 +47,7 @@ namespace BlazorFullCalendar.Data
                 buttonText = label,
                 duration = CalendarDurationObject.Months(numberOfMonths),
                 slotLabelFormat = slotLabelFormatDefault,
-                columnHeaderFormat = columnHeaderFormatDefault
+                dayHeaderFormat = columnHeaderFormatDefault
             };
     }
 }

@@ -51,22 +51,22 @@
 
         settings = new CalendarSettings()
         {
-            plugins = new[] { "timeGrid", "dayGrid", "interaction" },
-            defaultView = "timeGrid2Weeks",
-            header = new CalendarHeader()
+            Plugins = new[] { "timeGrid", "dayGrid", "interaction" },
+            InitialView = "timeGrid2Weeks",
+            headerToolbar  = new CalendarHeader()
             {
                 left = "prev,next today",
                 center = "title",
-                right = " timeGridDay,timeGrid4Days,timeGridWeek,timeGrid2Weeks,timeGrid4Weeks dayGridMonth,dayGridYear"
+                right = "timeGridDay,timeGrid4Days,timeGridWeek,timeGrid2Weeks,timeGrid4Weeks dayGridMonth,dayGridYear"
             },
             //refetchResourcesOnNavigate = true,
             minTime = new CalendarDurationObject() { hour = 6 },
             maxTime = new CalendarDurationObject() { hour = 24 },
-            eventStartEditable = true,
-            eventResizableFromStart = true,
-            eventDurationEditable = true,
+            EventStartEditable = true,
+            EventResizableFromStart = true,
+            EventDurationEditable = true,
             firstDay = 1,
-            locale = "de",
+            locale = "en",
             //editable = true,
             //droppable = true,
             //drop = "BlazorFullCalendar.interop.calendarOnDrop",

@@ -1,6 +1,6 @@
 ﻿@inherits CalendarPageBase
 
-@page "/monthviewarray"
+@page "/interactive"
 
 <h3>MonthView (Array Source)</h3>
 
@@ -16,7 +16,7 @@
             Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction, CalendarPluginTypes.Bootstrap },
             InitialView = "dayGridTwoMonths",
             timeZone = "UTC",
-            
+            Editable = true,
             headerToolbar  = new CalendarHeader()
             {
                 left = "title",
