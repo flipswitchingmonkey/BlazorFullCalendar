@@ -14,6 +14,8 @@ namespace BlazorFullCalendar
     {
         ElementReference elem;
 
+        private static uint instanceNumber = 0;
+
         [Inject] private IJSRuntime jsRuntime { get; set; }
 
         [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> ExtraAttributes { get; set; }
@@ -29,26 +31,38 @@ namespace BlazorFullCalendar
         private CalendarInteropService interop;
         private DotNetObjectReference<FullCalendar> _objRef;
 
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+
+            instanceNumber++;
+            Id += instanceNumber.ToString();
+        }
+
+        private async Task Refetch()
+        {
+            await interop.CalendarRefetchEvents();
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                interop = new CalendarInteropService(jsRuntime);
+                interop = new CalendarInteropService(Id, jsRuntime);
                 _objRef = DotNetObjectReference.Create(this);
-                await interop.SetDotNetReference(_objRef);
                 await InitCalendar();
+                await interop.SetDotNetReference(_objRef);
             }
         }
 
         public async Task InitCalendar()
         {
-            await interop.CalendarInit("calendar", settings);
+            await interop.CalendarInit(settings, _objRef);
             await InvokeAsync(() => { StateHasChanged(); });
         }
 
         public async Task ChangeResourceFeed(CalendarResourceFeed calendarResourceFeed)
         {
-            //var interop = new Services.InteropService(jsRuntime);
             await interop.CalendarChangeResourceFeed(calendarResourceFeed);
             await InvokeAsync(() => { StateHasChanged(); });
         }
@@ -137,6 +151,11 @@ namespace BlazorFullCalendar
 
         public void Dispose()
         {
+            //instanceNumber--;
+
+            if (interop != null)
+                interop.Dispose();
+
             _objRef?.Dispose();
         }
     }

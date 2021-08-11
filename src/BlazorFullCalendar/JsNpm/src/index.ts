@@ -19,7 +19,8 @@ const moment = require('moment');
 
 // replacer function for json stringify to filter out null values
 function replaceNullWithUndefined(key, value) {
-    if (value === null) {
+
+    if (value === null || value === "null") {
         return undefined;
     }
 
@@ -42,14 +43,46 @@ export const getCircularReplacer = () => {
     };
 };
 
-export const FullCalendarWrapper = {
-    calendarRef: null,
-    draggables: null,
-    dotNetReference: null,
-    bakeInUtcTime: (date) => {
-        return moment(date).add(moment(date).utcOffset(), "minutes")
-    },
-    buildCalendarEventChangeResponse: (info) => {
+abstract class Interop {
+
+    protected dotNetReference;
+    protected calendarRef;
+
+    constructor(dotNetReference) {
+        this.SetDotNetReference(dotNetReference);
+    }
+
+    public SetDotNetReference = (dotNetReference) => {
+        this.dotNetReference = dotNetReference;
+    }
+
+    public SetFCalendarReference = (calendarReference) => {
+        this.calendarRef = calendarReference;
+    }
+
+    protected getElementByName = (name) => {
+        var elements = document.getElementsByName(name);
+
+        if (elements.length) {
+            return elements[0];
+        } else {
+            return "";
+        }
+    };
+};
+
+class InteropCallableFromJs extends Interop {
+
+    private callBackDotNetWithInfo = (functionName, info) => {
+        if (this.dotNetReference !== null) {
+            this.dotNetReference.invokeMethodAsync(
+                functionName,
+                this.buildCalendarEventChangeResponse(info)
+            );
+        }
+    };
+
+    private buildCalendarEventChangeResponse = (info) => {
 
         var response: any = {};
 
@@ -98,154 +131,204 @@ export const FullCalendarWrapper = {
 
         }
 
-        return JSON.stringify(response, FullCalendarWrapper.replaceNullWithUndefined);
-    },
-    replaceNullWithUndefined: (key, value) => {
-        // console.log(key, value);
-        if (value === null || value === "null") {
-            return undefined;
+        return JSON.stringify(response, replaceNullWithUndefined);
+    };
+
+    public CalendarOnDrop = (info) => {
+        if (this.calendarRef !== null) {
+            this.callBackDotNetWithInfo('AddEventCallback', info);
+            info.remove();
         }
-        return value;
+    };
+
+    public CalendarOnEventResize = (info) => {
+        if (this.calendarRef !== null) {
+            this.callBackDotNetWithInfo('ResizeEventCallback', info);
+        }
+    };
+
+    public CalendarOnEventChange = (info) => {
+        if (this.calendarRef !== null) {
+            this.callBackDotNetWithInfo('UpdateEventCallback', info);
+        }
+    };
+
+    public CalendarOnEventClick = (info) => {
+        if (this.calendarRef !== null) {
+            this.callBackDotNetWithInfo('ClickEventCallback', info);
+        }
+    };
+
+    public CalendarOnEventDrop = (info) => {
+        if (this.calendarRef !== null) {
+            this.callBackDotNetWithInfo('DropEventCallback', info);
+        }
+    };
+}
+
+class InteropCallableFromDotNet extends Interop {
+
+    public CalendarChangeDuration = (units, amount) => {
+        if (this.calendarRef !== null) {
+            this.calendarRef.setOption('duration', { units: amount });
+        }
+    };
+
+    public CalendarSetOption = (option, value) => {
+        if (this.calendarRef !== null) {
+            this.calendarRef.setOption(option, value);
+        }
+    };
+
+    public CalendarRefetchResources = (newCalendarResourceFeed) => {
+        if (this.calendarRef !== null) {
+            this.calendarRef.setOption('resources', newCalendarResourceFeed);
+            this.calendarRef.refetchResources();
+        }
+    };
+
+    public CalendarRefetchEvents = () => {
+        if (this.calendarRef !== null) {
+            this.calendarRef.refetchEvents();
+        }
+    };
+}
+
+class FullCalendarWrapper {
+    private calendarEl: HTMLElement;
+
+    private calendarRef = null;
+    private draggables = null;
+    private dotNetReference = null;
+
+    private fromJsInterop: InteropCallableFromJs;
+    public FromDotNetInterop: InteropCallableFromDotNet;
+
+    constructor(calendarDivId: string, settingsJson: string, dotNetReference) {
+        this.calendarEl = document.getElementById(calendarDivId);
+        this.dotNetReference = dotNetReference;
+
+        var parsedSettings = JSON.parse(settingsJson);
+        parsedSettings.plugins = this.addPlugins(parsedSettings);
+
+        this.fromJsInterop = new InteropCallableFromJs(dotNetReference);
+        this.FromDotNetInterop = new InteropCallableFromDotNet(dotNetReference);
+
+        this.bindWithJsInterop(parsedSettings);
+
+        if (parsedSettings.droppable === true) {
+            this.draggables = new Draggable(document.getElementById('external-events'), {
+                itemSelector: '.fc-event',
+                eventData: function (eventEl) {
+                    return {
+                        title: eventEl.innerText
+                    };
+                }
+            });
+        }
+
+        this.calendarRef = new Calendar(this.calendarEl, parsedSettings);
+        this.Render();
+
+        this.fromJsInterop.SetFCalendarReference(this.calendarRef);
+        this.FromDotNetInterop.SetFCalendarReference(this.calendarRef);
+    }
+
+    private addPlugins = (parsedSettings: any): PluginDef[] => {
+
+        let plugins: PluginDef[] = [];
+
+        for (let it of parsedSettings.plugins) {
+            if (it.includes('dayGrid')) {
+                plugins.push(dayGridPlugin);
+            } else if (it.includes('interaction')) {
+                plugins.push(interactionPlugin);
+            } else if (it.includes('timeGrid')) {
+                plugins.push(timeGridPlugin);
+            } else if (it.includes('list')) {
+                plugins.push(listPlugin);
+            } else if (it.includes('bootstrap')) {
+                plugins.push(bootstrapPlugin);
+            } else if (it.includes('googleCalendar')) {
+                plugins.push(googleCalendarPlugin);
+            }
+        }
+
+        return plugins;
+    }
+
+    private bindWithJsInterop = (parsedSettings) => {
+
+        parsedSettings.eventResize = this.fromJsInterop.CalendarOnEventResize;
+        parsedSettings.eventChange = this.fromJsInterop.CalendarOnEventChange;
+        parsedSettings.drop = this.fromJsInterop.CalendarOnDrop;
+        parsedSettings.eventDrop = this.fromJsInterop.CalendarOnEventDrop;
+        parsedSettings.eventClick = this.fromJsInterop.CalendarOnEventClick;
+
+        if (parsedSettings.eventResizeStart !== null)
+            parsedSettings.eventResizeStart = eval(parsedSettings.eventResizeStart);
+
+        if (parsedSettings.eventResizeStop !== null)
+            parsedSettings.eventResizeStop = eval(parsedSettings.eventResizeStop);
+
+        if (parsedSettings.eventMouseEnter !== null)
+            parsedSettings.eventMouseEnter = eval(parsedSettings.eventMouseEnter);
+
+        if (parsedSettings.eventMouseLeave !== null)
+            parsedSettings.eventMouseLeave = eval(parsedSettings.eventMouseLeave);
+
+        if (parsedSettings.eventDragStart !== null)
+            parsedSettings.eventDragStart = eval(parsedSettings.eventDragStart);
+
+        if (parsedSettings.eventDragStop !== null)
+            parsedSettings.eventDragStop = eval(parsedSettings.eventDragStop);
+    }
+
+    public SetDotNetReference = (dotNetReference) => {
+
+        this.dotNetReference = dotNetReference;
+
+        this.fromJsInterop.SetDotNetReference(dotNetReference);
+        this.FromDotNetInterop.SetDotNetReference(dotNetReference);
+    };
+
+    public Render = () => {
+        this.calendarRef.render();
+    }
+
+    private backInUtcTime = (date) => {
+        return moment(date).add(moment(date).utcOffset(), "minutes")
+    };
+}
+
+export const FCWrapperInstances: Map<string, FullCalendarWrapper> = new Map<string, FullCalendarWrapper>();
+
+export function AddFCWrapperInstance(calendarDivId: string, settingsJson: string, dotNetReference) {
+    FCWrapperInstances.set(calendarDivId, new FullCalendarWrapper(calendarDivId, settingsJson, dotNetReference));
+}
+
+export const interop = {
+    calendarChangeDuration: (calendarDivId: string, units, amount) => {
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarChangeDuration(units, amount);
     },
 
+    calendarSetOption: (calendarDivId: string, option, value) => {
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarSetOption(option, value);
+    },
 
-    interop: {
-        getElementByName: (name) => {
-            var elements = document.getElementsByName(name);
-            console.log(elements);
+    calendarRefetchResources: (calendarDivId: string, newCalendarResourceFeed) => {
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarRefetchResources(newCalendarResourceFeed);
+    },
 
-            if (elements.length) {
-                return elements[0];
-            } else {
-                return "";
-            }
-        },
-        calendarInit: (elementName, settings) => {
-            //console.log(settings);
-            var calendarSettings = JSON.parse(settings);
-            //console.log(calendarSettings);
-            var calendarEl = document.getElementById(elementName);
+    calendarRefetchEvents: (calendarDivId: string) => {
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarRefetchEvents();
+    },
 
-            let plugins: PluginDef[] = [];
-            for (let it of calendarSettings.plugins) {
-                if (it.includes('dayGrid')) {
-                    plugins.push(dayGridPlugin);
-                } else if (it.includes('interaction')) {
-                    plugins.push(interactionPlugin);
-                } else if (it.includes('timeGrid')) {
-                    plugins.push(timeGridPlugin);
-                } else if (it.includes('list')) {
-                    plugins.push(listPlugin);
-                } else if (it.includes('bootstrap')) {
-                    plugins.push(bootstrapPlugin);
-                } else if (it.includes('googleCalendar')) {
-                    plugins.push(googleCalendarPlugin);
-                }
-            }
+    setDotNetReference: (calendarDivId: string, dotNetReference) => {
+        FCWrapperInstances.get(calendarDivId).SetDotNetReference(dotNetReference);
+    },
+}
 
-            calendarSettings.plugins = plugins;
-
-            calendarSettings.eventResize = FullCalendarWrapper.interop.calendarOnEventResize;
-
-            calendarSettings.eventChange = FullCalendarWrapper.interop.calendarOnEventChange;
-
-            if (calendarSettings.eventResizeStart !== null)
-                calendarSettings.eventResizeStart = eval(calendarSettings.eventResizeStart);
-
-            if (calendarSettings.eventResizeStop !== null)
-                calendarSettings.eventResizeStop = eval(calendarSettings.eventResizeStop);
-
-            calendarSettings.drop = FullCalendarWrapper.interop.calendarOnDrop;
-
-            calendarSettings.eventDrop = FullCalendarWrapper.interop.calendarOnEventDrop;
-
-            calendarSettings.eventClick = FullCalendarWrapper.interop.calendarOnEventClick;
-
-            if (calendarSettings.eventMouseEnter !== null)
-                calendarSettings.eventMouseEnter = eval(calendarSettings.eventMouseEnter);
-
-            if (calendarSettings.eventMouseLeave !== null)
-                calendarSettings.eventMouseLeave = eval(calendarSettings.eventMouseLeave);
-
-            if (calendarSettings.eventDragStart !== null)
-                calendarSettings.eventDragStart = eval(calendarSettings.eventDragStart);
-
-            if (calendarSettings.eventDragStop !== null)
-                calendarSettings.eventDragStop = eval(calendarSettings.eventDragStop);
-
-            if (calendarSettings.droppable === true) {
-                FullCalendarWrapper.draggables = new Draggable(document.getElementById('external-events'), {
-                    itemSelector: '.fc-event',
-                    eventData: function (eventEl) {
-                        return {
-                            title: eventEl.innerText
-                        };
-                    }
-                });
-            }
-            // console.log(calendarSettings);
-            FullCalendarWrapper.calendarRef = new Calendar(calendarEl, calendarSettings);
-            // console.log(BlazorFullCalendar.calendarRef);
-            FullCalendarWrapper.calendarRef.render();
-        },
-        calendarChangeDuration: (units, amount) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.calendarRef.setOption('duration', { units: amount });
-            }
-        },
-        calendarSetOption: (option, value) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.calendarRef.setOption(option, value);
-            }
-        },
-        calendarRefetchResources: (newCalendarResourceFeed) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.calendarRef.setOption('resources', newCalendarResourceFeed);
-                FullCalendarWrapper.calendarRef.refetchResources();
-            }
-        },
-        calendarRefetchEvents: () => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.calendarRef.refetchEvents();
-            }
-        },
-        calendarOnDrop: (info) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.interop.callBackDotNetWithInfo('AddEventCallback', info);
-                info.remove();
-            }
-        },
-        calendarOnEventResize: (info) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.interop.callBackDotNetWithInfo('ResizeEventCallback', info);
-            }
-        },
-        calendarOnEventChange: (info) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.interop.callBackDotNetWithInfo('UpdateEventCallback', info);
-            }
-        },
-        calendarOnEventClick: (info) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.interop.callBackDotNetWithInfo('ClickEventCallback', info);
-            }
-        },
-        calendarOnEventDrop: (info) => {
-            if (FullCalendarWrapper.calendarRef !== null) {
-                FullCalendarWrapper.interop.callBackDotNetWithInfo('DropEventCallback', info);
-            }
-        },
-        callBackDotNetWithInfo: (functionName, info) => {
-            if (FullCalendarWrapper.dotNetReference !== null) {
-                FullCalendarWrapper.dotNetReference.invokeMethodAsync(
-                    functionName,
-                    FullCalendarWrapper.buildCalendarEventChangeResponse(info)
-                );
-            }
-        },
-        SetDotNetReference: (ref) => {
-            FullCalendarWrapper.dotNetReference = ref;
-        },
-
-    }
-};
+export function DeleteFCWrapperInstance(calendarDivId: string) {
+    FCWrapperInstances.delete(calendarDivId);
+}

@@ -7,12 +7,21 @@
 
 <FullCalendar settings="@calendarSettings" OnClickEvent="OnClickHandler" OnUpdateEvent="OnResizeHandler"/>
 
+<br/>
+
+<FullCalendar settings="@calendarSettings" OnClickEvent="OnClickHandler2" OnUpdateEvent="OnResizeHandler"/>
+
 @code {
     public CalendarSettings calendarSettings { get; set; }
 
     private void OnClickHandler(CalendarEventChangeResponse response)
     {
         _jsRuntime.InvokeVoidAsync("alert", response.ToString());
+    }
+
+    private void OnClickHandler2(CalendarEventChangeResponse response)
+    {
+        _jsRuntime.InvokeVoidAsync("alert", "22 " + response.ToString());
     }
 
     private void OnResizeHandler(CalendarEventChangeResponse response)
