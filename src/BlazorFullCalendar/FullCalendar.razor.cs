@@ -22,7 +22,9 @@ namespace BlazorFullCalendar
         [Parameter] public CalendarSettings settings { get; set; }
         [Parameter] public EventCallback<CalendarEventChangeResponse> OnAddEvent { get; set; }
         [Parameter] public EventCallback<CalendarEventChangeResponse> OnUpdateEvent { get; set; }
+        [Parameter] public EventCallback<CalendarEventChangeResponse> OnResizeEvent { get; set; }
         [Parameter] public EventCallback<CalendarEventChangeResponse> OnClickEvent { get; set; }
+        [Parameter] public EventCallback<CalendarEventChangeResponse> OnDropEvent { get; set; }
 
         private CalendarInteropService interop;
         private DotNetObjectReference<FullCalendar> _objRef;
@@ -91,6 +93,20 @@ namespace BlazorFullCalendar
             }
         }
 
+        [JSInvokable("ResizeEventCallback")]
+        public async Task ResizeEventCallback(string returnValue)
+        {
+            try
+            {
+                var response = JsonConvert.DeserializeObject<CalendarEventChangeResponse>(returnValue);
+                await OnResizeEvent.InvokeAsync(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         [JSInvokable("ClickEventCallback")]
         public async Task ClickEventCallback(string returnValue)
         {
@@ -98,6 +114,20 @@ namespace BlazorFullCalendar
             {
                 var response = JsonConvert.DeserializeObject<CalendarEventChangeResponse>(returnValue);
                 await OnClickEvent.InvokeAsync(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        [JSInvokable("DropEventCallback")]
+        public async Task DropEventCallback(string returnValue)
+        {
+            try
+            {
+                var response = JsonConvert.DeserializeObject<CalendarEventChangeResponse>(returnValue);
+                await OnDropEvent.InvokeAsync(response);
             }
             catch (Exception ex)
             {

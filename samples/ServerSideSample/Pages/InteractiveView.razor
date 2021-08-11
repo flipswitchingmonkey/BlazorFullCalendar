@@ -1,13 +1,24 @@
 ﻿@inherits CalendarPageBase
+@inject IJSRuntime _jsRuntime
 
 @page "/interactive"
 
 <h3>MonthView (Array Source)</h3>
 
-<FullCalendar settings="@calendarSettings" />
+<FullCalendar settings="@calendarSettings" OnClickEvent="OnClickHandler" OnUpdateEvent="OnResizeHandler"/>
 
 @code {
     public CalendarSettings calendarSettings { get; set; }
+
+    private void OnClickHandler(CalendarEventChangeResponse response)
+    {
+        _jsRuntime.InvokeVoidAsync("alert", response.ToString());
+    }
+
+    private void OnResizeHandler(CalendarEventChangeResponse response)
+    {
+        _jsRuntime.InvokeVoidAsync("alert", "Changement !" + response.ToString());
+    }
 
     protected override void OnInitialized()
     {

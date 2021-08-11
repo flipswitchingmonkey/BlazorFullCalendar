@@ -35,7 +35,7 @@ namespace BlazorFullCalendar.Services
             try
             {
                 await jsRuntime.InvokeAsync<ElementReference>(
-                    "BlazorFullCalendar.FullCalendar.interop.calendarInit",
+                    "BlazorFullCalendar.FullCalendarWrapper.interop.calendarInit",
                     elementName,
                     settings.ToJson(),
                     dotNetRef
@@ -54,7 +54,7 @@ namespace BlazorFullCalendar.Services
             try
             {
                 jsRuntime.InvokeAsync<string>(
-                    "BlazorFullCalendar.FullCalendar.interop.calendarChangeDuration",
+                    "BlazorFullCalendar.FullCalendarWrapper.interop.calendarChangeDuration",
                     unit,
                     amount
                     );
@@ -72,7 +72,7 @@ namespace BlazorFullCalendar.Services
             try
             {
                 jsRuntime.InvokeAsync<string>(
-                    "BlazorFullCalendar.FullCalendar.interop.calendarSetOption",
+                    "BlazorFullCalendar.FullCalendarWrapper.interop.calendarSetOption",
                     option,
                     json
                     );
@@ -89,7 +89,7 @@ namespace BlazorFullCalendar.Services
             try
             {
                 jsRuntime.InvokeAsync<string>(
-                    "BlazorFullCalendar.FullCalendar.interop.calendarRefetchResources",
+                    "BlazorFullCalendar.FullCalendarWrapper.interop.calendarRefetchResources",
                     calendarResourceFeed
                     );
                 return Task.CompletedTask;
@@ -105,7 +105,7 @@ namespace BlazorFullCalendar.Services
             try
             {
                 jsRuntime.InvokeAsync<string>(
-                    "BlazorFullCalendar.FullCalendar.interop.calendarRefetchEvents"
+                    "BlazorFullCalendar.FullCalendarWrapper.interop.calendarRefetchEvents"
                     );
                 return Task.CompletedTask;
             }
@@ -120,7 +120,7 @@ namespace BlazorFullCalendar.Services
             try
             {
                 jsRuntime.InvokeVoidAsync(
-                    "BlazorFullCalendar.FullCalendar.interop.SetDotNetReference",
+                    "BlazorFullCalendar.FullCalendarWrapper.interop.SetDotNetReference",
                     reference);
                 return Task.CompletedTask;
             }

@@ -42,7 +42,7 @@ export const getCircularReplacer = () => {
     };
 };
 
-export const FullCalendar = {
+export const FullCalendarWrapper = {
     calendarRef: null,
     draggables: null,
     dotNetReference: null,
@@ -98,7 +98,7 @@ export const FullCalendar = {
 
         }
 
-        return JSON.stringify(response, FullCalendar.replaceNullWithUndefined);
+        return JSON.stringify(response, FullCalendarWrapper.replaceNullWithUndefined);
     },
     replaceNullWithUndefined: (key, value) => {
         // console.log(key, value);
@@ -145,8 +145,9 @@ export const FullCalendar = {
 
             calendarSettings.plugins = plugins;
 
-            if (calendarSettings.eventResize !== null)
-                calendarSettings.eventResize = eval(calendarSettings.eventResize);
+            calendarSettings.eventResize = FullCalendarWrapper.interop.calendarOnEventResize;
+
+            calendarSettings.eventChange = FullCalendarWrapper.interop.calendarOnEventChange;
 
             if (calendarSettings.eventResizeStart !== null)
                 calendarSettings.eventResizeStart = eval(calendarSettings.eventResizeStart);
@@ -154,14 +155,11 @@ export const FullCalendar = {
             if (calendarSettings.eventResizeStop !== null)
                 calendarSettings.eventResizeStop = eval(calendarSettings.eventResizeStop);
 
-            if (calendarSettings.drop !== null)
-                calendarSettings.drop = eval(calendarSettings.drop);
+            calendarSettings.drop = FullCalendarWrapper.interop.calendarOnDrop;
 
-            if (calendarSettings.eventDrop !== null)
-                calendarSettings.eventDrop = eval(calendarSettings.eventDrop);
+            calendarSettings.eventDrop = FullCalendarWrapper.interop.calendarOnEventDrop;
 
-            if (calendarSettings.eventClick !== null)
-                calendarSettings.eventClick = eval(calendarSettings.eventClick);
+            calendarSettings.eventClick = FullCalendarWrapper.interop.calendarOnEventClick;
 
             if (calendarSettings.eventMouseEnter !== null)
                 calendarSettings.eventMouseEnter = eval(calendarSettings.eventMouseEnter);
@@ -176,7 +174,7 @@ export const FullCalendar = {
                 calendarSettings.eventDragStop = eval(calendarSettings.eventDragStop);
 
             if (calendarSettings.droppable === true) {
-                FullCalendar.draggables = new Draggable(document.getElementById('external-events'), {
+                FullCalendarWrapper.draggables = new Draggable(document.getElementById('external-events'), {
                     itemSelector: '.fc-event',
                     eventData: function (eventEl) {
                         return {
@@ -186,57 +184,67 @@ export const FullCalendar = {
                 });
             }
             // console.log(calendarSettings);
-            FullCalendar.calendarRef = new Calendar(calendarEl, calendarSettings);
+            FullCalendarWrapper.calendarRef = new Calendar(calendarEl, calendarSettings);
             // console.log(BlazorFullCalendar.calendarRef);
-            FullCalendar.calendarRef.render();
+            FullCalendarWrapper.calendarRef.render();
         },
         calendarChangeDuration: (units, amount) => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.calendarRef.setOption('duration', { units: amount });
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.calendarRef.setOption('duration', { units: amount });
             }
         },
         calendarSetOption: (option, value) => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.calendarRef.setOption(option, value);
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.calendarRef.setOption(option, value);
             }
         },
         calendarRefetchResources: (newCalendarResourceFeed) => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.calendarRef.setOption('resources', newCalendarResourceFeed);
-                FullCalendar.calendarRef.refetchResources();
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.calendarRef.setOption('resources', newCalendarResourceFeed);
+                FullCalendarWrapper.calendarRef.refetchResources();
             }
         },
         calendarRefetchEvents: () => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.calendarRef.refetchEvents();
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.calendarRef.refetchEvents();
             }
         },
         calendarOnDrop: (info) => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.interop.callBackDotNetWithInfo('AddEventCallback', info);
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.interop.callBackDotNetWithInfo('AddEventCallback', info);
                 info.remove();
             }
         },
         calendarOnEventResize: (info) => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.interop.callBackDotNetWithInfo('UpdateEventCallback', info);
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.interop.callBackDotNetWithInfo('ResizeEventCallback', info);
+            }
+        },
+        calendarOnEventChange: (info) => {
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.interop.callBackDotNetWithInfo('UpdateEventCallback', info);
             }
         },
         calendarOnEventClick: (info) => {
-            if (FullCalendar.calendarRef !== null) {
-                FullCalendar.interop.callBackDotNetWithInfo('ClickEventCallback', info);
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.interop.callBackDotNetWithInfo('ClickEventCallback', info);
+            }
+        },
+        calendarOnEventDrop: (info) => {
+            if (FullCalendarWrapper.calendarRef !== null) {
+                FullCalendarWrapper.interop.callBackDotNetWithInfo('DropEventCallback', info);
             }
         },
         callBackDotNetWithInfo: (functionName, info) => {
-            if (FullCalendar.dotNetReference !== null) {
-                FullCalendar.dotNetReference.invokeMethodAsync(
+            if (FullCalendarWrapper.dotNetReference !== null) {
+                FullCalendarWrapper.dotNetReference.invokeMethodAsync(
                     functionName,
-                    FullCalendar.buildCalendarEventChangeResponse(info)
+                    FullCalendarWrapper.buildCalendarEventChangeResponse(info)
                 );
             }
         },
         SetDotNetReference: (ref) => {
-            FullCalendar.dotNetReference = ref;
+            FullCalendarWrapper.dotNetReference = ref;
         },
 
     }
