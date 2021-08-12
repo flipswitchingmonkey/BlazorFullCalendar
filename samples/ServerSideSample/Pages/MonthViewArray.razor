@@ -11,26 +11,35 @@
 
     protected override void OnInitialized()
     {
-        calendarSettings = new CalendarSettings()
+        calendarSettings = new CalendarSettings
         {
             Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction, CalendarPluginTypes.Bootstrap },
             InitialView = "dayGridTwoMonths",
-            timeZone = "UTC",
+            TimeZone = "UTC",
             
-            headerToolbar  = new CalendarHeader()
+            HeaderToolbar  = new CalendarHeader
             {
-                left = "title",
-                center = "",
-                right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
+                Left = "title",
+                Center = "",
+                Right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
             },
-            themeSystem = "bootstrap",
-            views = new Dictionary<string, CalendarViewDefinition>()
+            ThemeSystem = "bootstrap",
+            Views = new Dictionary<string, CalendarViewDefinition>()
             {
-                { "dayGridOneWeek", CalendarViewDefinition.DayGridWeeks(1,"One Week") },
-                { "dayGridTwoWeeks", CalendarViewDefinition.DayGridWeeks(2,"Two Weeks") },
-                { "dayGridTwoMonths", CalendarViewDefinition.DayGridMonths(2,"Two Months") },
+                { 
+                    "dayGridOneWeek", 
+                    CalendarViewDefinition.DayGridWeeks(1,"One Week") 
+                },
+                { 
+                    "dayGridTwoWeeks", 
+                    CalendarViewDefinition.DayGridWeeks(2,"Two Weeks") 
+                },
+                {
+                    "dayGridTwoMonths", 
+                    CalendarViewDefinition.DayGridMonths(2,"Two Months") 
+                },
             },
-            events = GetRandomEvents(50).ToArray()
+            Events = GetRandomEvents(50).ToArray()
         };
     }
 

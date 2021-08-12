@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace BlazorFullCalendar.Data
 {
-    public class CalendarResourceItem
+    public class CalendarResourceItem : JsonSerializable
     {
-        public int id { get; set; }
-        public string title { get; set; }
-        public string status { get; set; }
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("status")]
+        public string Status { get; set; }
     }
 }

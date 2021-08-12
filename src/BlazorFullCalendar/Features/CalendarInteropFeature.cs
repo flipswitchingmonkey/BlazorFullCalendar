@@ -1,33 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Components;
-using BlazorFullCalendar;
 using BlazorFullCalendar.Data;
 
-namespace BlazorFullCalendar.Services
+namespace BlazorFullCalendar.Features
 {
-    public interface ICalendarInteropService : IDisposable
+    public interface ICalendarInteropService : IAsyncDisposable
     {
-        Task CalendarInit(CalendarSettings settings, DotNetObjectReference<FullCalendar> dotNetRef);
-        Task CalendarDispose();
-        Task CalendarChangeDuration(string unit, int amount);
-        Task CalendarSetOption(string option, dynamic value);
-        Task CalendarChangeResourceFeed(CalendarResourceFeed calendarResourceFeed);
-        Task CalendarRefetchEvents();
-        Task SetDotNetReference(DotNetObjectReference<FullCalendar> reference);
+        Task CalendarInitAsync(CalendarSettings settings, DotNetObjectReference<FullCalendar> dotNetRef);
+        Task CalendarDisposeAsync();
+        Task CalendarChangeDurationAsync(CalendarDurationObject duration);
+        Task CalendarSetOptionAsync(string option, dynamic value);
+        Task CalendarChangeResourceFeedAsync(CalendarResourceFeed calendarResourceFeed);
+        Task CalendarRefetchEventsAsync();
+        Task SetDotNetReferenceAsync(DotNetObjectReference<FullCalendar> reference);
     }
 
-    public class CalendarInteropService : ICalendarInteropService
+    public class CalendarInteropFeature : ICalendarInteropService
     {
         private readonly IJSRuntime _jsRuntime;
         private readonly string _calendarDivId;
-        private readonly DotNetObjectReference<CalendarInteropService> _objRef;
+        private readonly DotNetObjectReference<CalendarInteropFeature> _objRef;
 
-        public CalendarInteropService(string calendarDivId, IJSRuntime jsRuntime)
+        public CalendarInteropFeature(string calendarDivId, IJSRuntime jsRuntime)
         {
             _calendarDivId = calendarDivId;
             _jsRuntime = jsRuntime;
@@ -35,12 +31,12 @@ namespace BlazorFullCalendar.Services
         }
 
 
-        public async Task CalendarInit(CalendarSettings settings, DotNetObjectReference<FullCalendar> dotNetRef)
+        public async Task CalendarInitAsync(CalendarSettings settings, DotNetObjectReference<FullCalendar> dotNetRef)
         {
             try
             {
                 await _jsRuntime.InvokeVoidAsync(
-                    "BlazorFullCalendar.AddFCWrapperInstance",
+                    "BlazorFullCalendar.addFCWrapperInstance",
                     _calendarDivId,
                     settings.ToJson(),
                     dotNetRef
@@ -54,12 +50,12 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public async Task CalendarDispose()
+        public async Task CalendarDisposeAsync()
         {
             try
             {
                 await _jsRuntime.InvokeVoidAsync(
-                    "BlazorFullCalendar.DeleteFCWrapperInstance",
+                    "BlazorFullCalendar.deleteFCWrapperInstance",
                     _calendarDivId
                 );
                 return;
@@ -71,16 +67,14 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public async Task CalendarChangeDuration(string unit, int amount)
+        public async Task CalendarChangeDurationAsync(CalendarDurationObject duration)
         {
             try
             {
                 await _jsRuntime.InvokeAsync<string>(
-                    //$"BlazorFullCalendar.FCWrapperInstances.get('{_calendarDivId}']).FromDotNetInterop.CalendarChangeDuration",
                     "BlazorFullCalendar.interop.calendarChangeDuration",
                     _calendarDivId,
-                    unit,
-                    amount
+                    duration.ToJson()
                 );
                 return;
             }
@@ -91,13 +85,12 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public async Task CalendarSetOption(string option, dynamic value)
+        public async Task CalendarSetOptionAsync(string option, dynamic value)
         {
             string json = JsonConvert.SerializeObject(value);
             try
             {
                 await _jsRuntime.InvokeAsync<string>(
-                    //$"BlazorFullCalendar.FCWrapperInstances.get('{_calendarDivId}').FromDotNetInterop.CalendarSetOption",
                     "BlazorFullCalendar.interop.calendarSetOption",
                     _calendarDivId,
                     option,
@@ -112,12 +105,11 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public async Task CalendarChangeResourceFeed(CalendarResourceFeed calendarResourceFeed)
+        public async Task CalendarChangeResourceFeedAsync(CalendarResourceFeed calendarResourceFeed)
         {
             try
             {
                 await _jsRuntime.InvokeAsync<string>(
-                    //$"BlazorFullCalendar.FCWrapperInstances.get('{_calendarDivId}').FromDotNetInterop.CalendarRefetchResources",
                     "BlazorFullCalendar.interop.calendarRefetchResources",
                     _calendarDivId,
                     calendarResourceFeed
@@ -131,12 +123,11 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public async Task CalendarRefetchEvents()
+        public async Task CalendarRefetchEventsAsync()
         {
             try
             {
                 await _jsRuntime.InvokeAsync<string>(
-                    //$"BlazorFullCalendar.FCWrapperInstances.get('{_calendarDivId}').FromDotNetInterop.CalendarRefetchEvents"
                     "BlazorFullCalendar.interop.calendarRefetchEvents",
                     _calendarDivId
                 );
@@ -149,12 +140,11 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public async Task SetDotNetReference(DotNetObjectReference<FullCalendar> reference)
+        public async Task SetDotNetReferenceAsync(DotNetObjectReference<FullCalendar> reference)
         {
             try
             {
                 await _jsRuntime.InvokeVoidAsync(
-                    //$"BlazorFullCalendar.FCWrapperInstances.get('{_calendarDivId}').SetDotNetReference",
                     "BlazorFullCalendar.interop.setDotNetReference",
                     _calendarDivId,
                     reference
@@ -168,9 +158,9 @@ namespace BlazorFullCalendar.Services
             }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            CalendarDispose();
+            await CalendarDisposeAsync();
 
             _objRef?.Dispose();
         }

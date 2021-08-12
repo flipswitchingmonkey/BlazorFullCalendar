@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 // FullCalendar
-import { Calendar, PluginDef } from '@fullcalendar/core';
+import { Calendar, DurationInput, PluginDef } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
@@ -43,21 +43,17 @@ export const getCircularReplacer = () => {
     };
 };
 
+
+interface FCWrapperData {
+    dotNetReference: any;
+    calendarRef: Calendar;
+}
+
 abstract class Interop {
+    protected wrapperData: FCWrapperData;
 
-    protected dotNetReference;
-    protected calendarRef;
-
-    constructor(dotNetReference) {
-        this.SetDotNetReference(dotNetReference);
-    }
-
-    public SetDotNetReference = (dotNetReference) => {
-        this.dotNetReference = dotNetReference;
-    }
-
-    public SetFCalendarReference = (calendarReference) => {
-        this.calendarRef = calendarReference;
+    constructor(wrapperData: FCWrapperData) {
+        this.wrapperData = wrapperData;
     }
 
     protected getElementByName = (name) => {
@@ -71,11 +67,12 @@ abstract class Interop {
     };
 };
 
+
 class InteropCallableFromJs extends Interop {
 
     private callBackDotNetWithInfo = (functionName, info) => {
-        if (this.dotNetReference !== null) {
-            this.dotNetReference.invokeMethodAsync(
+        if (this.wrapperData.dotNetReference !== null) {
+            this.wrapperData.dotNetReference.invokeMethodAsync(
                 functionName,
                 this.buildCalendarEventChangeResponse(info)
             );
@@ -134,85 +131,125 @@ class InteropCallableFromJs extends Interop {
         return JSON.stringify(response, replaceNullWithUndefined);
     };
 
-    public CalendarOnDrop = (info) => {
-        if (this.calendarRef !== null) {
-            this.callBackDotNetWithInfo('AddEventCallback', info);
+    public onDrop = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnDropCallback', info);
             info.remove();
         }
     };
 
-    public CalendarOnEventResize = (info) => {
-        if (this.calendarRef !== null) {
-            this.callBackDotNetWithInfo('ResizeEventCallback', info);
+    public onEventChange = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventChangeCallback', info);
         }
     };
 
-    public CalendarOnEventChange = (info) => {
-        if (this.calendarRef !== null) {
-            this.callBackDotNetWithInfo('UpdateEventCallback', info);
+    public onEventClick = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventClickCallback', info);
         }
     };
 
-    public CalendarOnEventClick = (info) => {
-        if (this.calendarRef !== null) {
-            this.callBackDotNetWithInfo('ClickEventCallback', info);
+    public onEventDrop = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventDropCallback', info);
         }
     };
 
-    public CalendarOnEventDrop = (info) => {
-        if (this.calendarRef !== null) {
-            this.callBackDotNetWithInfo('DropEventCallback', info);
+    public onEventResize = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventResizeCallback', info);
+        }
+    };
+
+    public onEventResizeStart = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventResizeStartCallback', info);
+        }
+    };
+
+    public onEventResizeStop = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventResizeStopCallback', info);
+        }
+    };
+
+    
+    public onEventMouseEnter = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventMouseEnterCallback', info);
+        }
+    };
+
+    public onEventMouseLeave = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventMouseLeaveCallback', info);
+        }
+    };
+
+    public onEventDragStart = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventDragStartCallback', info);
+        }
+    };
+
+    public onEventDragStop = (info) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.callBackDotNetWithInfo('OnEventDragStopCallback', info);
         }
     };
 }
 
 class InteropCallableFromDotNet extends Interop {
 
-    public CalendarChangeDuration = (units, amount) => {
-        if (this.calendarRef !== null) {
-            this.calendarRef.setOption('duration', { units: amount });
+    public calendarChangeDuration = (units: DurationInput) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.wrapperData.calendarRef.setOption('duration', units);
         }
     };
 
-    public CalendarSetOption = (option, value) => {
-        if (this.calendarRef !== null) {
-            this.calendarRef.setOption(option, value);
+    public calendarSetOption = (option, value) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.wrapperData.calendarRef.setOption(option, value);
         }
     };
 
-    public CalendarRefetchResources = (newCalendarResourceFeed) => {
-        if (this.calendarRef !== null) {
-            this.calendarRef.setOption('resources', newCalendarResourceFeed);
-            this.calendarRef.refetchResources();
+    public calendarRefetchResources = (newCalendarResourceFeed: string) => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.wrapperData.calendarRef.setOption('events', newCalendarResourceFeed);
+            this.wrapperData.calendarRef.refetchEvents();
         }
     };
 
-    public CalendarRefetchEvents = () => {
-        if (this.calendarRef !== null) {
-            this.calendarRef.refetchEvents();
+    public calendarRefetchEvents = () => {
+        if (this.wrapperData.calendarRef !== null) {
+            this.wrapperData.calendarRef.refetchEvents();
         }
     };
 }
 
 class FullCalendarWrapper {
     private calendarEl: HTMLElement;
-
-    private calendarRef = null;
     private draggables = null;
-    private dotNetReference = null;
+
+    private wrapperData: FCWrapperData;
 
     private fromJsInterop: InteropCallableFromJs;
     public FromDotNetInterop: InteropCallableFromDotNet;
 
     constructor(calendarDivId: string, settingsJson: string, dotNetReference) {
         this.calendarEl = document.getElementById(calendarDivId);
-        this.dotNetReference = dotNetReference;
+
+        this.wrapperData = {
+            dotNetReference: dotNetReference,
+            calendarRef: null
+        }
 
         var parsedSettings = JSON.parse(settingsJson);
         parsedSettings.plugins = this.addPlugins(parsedSettings);
 
-        this.fromJsInterop = new InteropCallableFromJs(dotNetReference);
-        this.FromDotNetInterop = new InteropCallableFromDotNet(dotNetReference);
+        this.fromJsInterop = new InteropCallableFromJs(this.wrapperData);
+        this.FromDotNetInterop = new InteropCallableFromDotNet(this.wrapperData);
 
         this.bindWithJsInterop(parsedSettings);
 
@@ -227,29 +264,26 @@ class FullCalendarWrapper {
             });
         }
 
-        this.calendarRef = new Calendar(this.calendarEl, parsedSettings);
-        this.Render();
-
-        this.fromJsInterop.SetFCalendarReference(this.calendarRef);
-        this.FromDotNetInterop.SetFCalendarReference(this.calendarRef);
+        this.wrapperData.calendarRef = new Calendar(this.calendarEl, parsedSettings);
+        this.render();
     }
 
     private addPlugins = (parsedSettings: any): PluginDef[] => {
 
         let plugins: PluginDef[] = [];
 
-        for (let it of parsedSettings.plugins) {
-            if (it.includes('dayGrid')) {
+        for (let pluginString of parsedSettings.plugins) {
+            if (pluginString.includes('dayGrid')) {
                 plugins.push(dayGridPlugin);
-            } else if (it.includes('interaction')) {
+            } else if (pluginString.includes('interaction')) {
                 plugins.push(interactionPlugin);
-            } else if (it.includes('timeGrid')) {
+            } else if (pluginString.includes('timeGrid')) {
                 plugins.push(timeGridPlugin);
-            } else if (it.includes('list')) {
+            } else if (pluginString.includes('list')) {
                 plugins.push(listPlugin);
-            } else if (it.includes('bootstrap')) {
+            } else if (pluginString.includes('bootstrap')) {
                 plugins.push(bootstrapPlugin);
-            } else if (it.includes('googleCalendar')) {
+            } else if (pluginString.includes('googleCalendar')) {
                 plugins.push(googleCalendarPlugin);
             }
         }
@@ -259,41 +293,40 @@ class FullCalendarWrapper {
 
     private bindWithJsInterop = (parsedSettings) => {
 
-        parsedSettings.eventResize = this.fromJsInterop.CalendarOnEventResize;
-        parsedSettings.eventChange = this.fromJsInterop.CalendarOnEventChange;
-        parsedSettings.drop = this.fromJsInterop.CalendarOnDrop;
-        parsedSettings.eventDrop = this.fromJsInterop.CalendarOnEventDrop;
-        parsedSettings.eventClick = this.fromJsInterop.CalendarOnEventClick;
+        parsedSettings.drop = this.fromJsInterop.onDrop;
 
-        if (parsedSettings.eventResizeStart !== null)
-            parsedSettings.eventResizeStart = eval(parsedSettings.eventResizeStart);
+        parsedSettings.eventChange = this.fromJsInterop.onEventChange;
 
-        if (parsedSettings.eventResizeStop !== null)
-            parsedSettings.eventResizeStop = eval(parsedSettings.eventResizeStop);
+        parsedSettings.eventClick = this.fromJsInterop.onEventClick;
 
-        if (parsedSettings.eventMouseEnter !== null)
-            parsedSettings.eventMouseEnter = eval(parsedSettings.eventMouseEnter);
+        parsedSettings.eventDrop = this.fromJsInterop.onEventDrop;
 
-        if (parsedSettings.eventMouseLeave !== null)
-            parsedSettings.eventMouseLeave = eval(parsedSettings.eventMouseLeave);
+        parsedSettings.eventResize = this.fromJsInterop.onEventResize;
+        parsedSettings.eventResizeStart = this.fromJsInterop.onEventResizeStart;
+        parsedSettings.eventResizeStop = this.fromJsInterop.onEventResizeStop;
 
-        if (parsedSettings.eventDragStart !== null)
-            parsedSettings.eventDragStart = eval(parsedSettings.eventDragStart);
+        parsedSettings.eventMouseEnter = this.fromJsInterop.onEventMouseEnter;
+        parsedSettings.eventMouseLeave = this.fromJsInterop.onEventMouseLeave;
 
-        if (parsedSettings.eventDragStop !== null)
-            parsedSettings.eventDragStop = eval(parsedSettings.eventDragStop);
+
+        parsedSettings.eventDragStart = this.fromJsInterop.onEventDragStart;
+        parsedSettings.eventDragStop = this.fromJsInterop.onEventDragStop;
     }
 
-    public SetDotNetReference = (dotNetReference) => {
+    set dotNetReference(dotNetReference) {
+        this.wrapperData.dotNetReference = dotNetReference;
+    }
 
-        this.dotNetReference = dotNetReference;
+    get dotNetReference() {
+        return this.wrapperData.dotNetReference;
+    }
 
-        this.fromJsInterop.SetDotNetReference(dotNetReference);
-        this.FromDotNetInterop.SetDotNetReference(dotNetReference);
-    };
+    get calendarReference() {
+        return this.wrapperData.calendarRef;
+    }
 
-    public Render = () => {
-        this.calendarRef.render();
+    public render = () => {
+        this.wrapperData.calendarRef.render();
     }
 
     private backInUtcTime = (date) => {
@@ -303,32 +336,34 @@ class FullCalendarWrapper {
 
 export const FCWrapperInstances: Map<string, FullCalendarWrapper> = new Map<string, FullCalendarWrapper>();
 
-export function AddFCWrapperInstance(calendarDivId: string, settingsJson: string, dotNetReference) {
+export function addFCWrapperInstance(calendarDivId: string, settingsJson: string, dotNetReference) {
     FCWrapperInstances.set(calendarDivId, new FullCalendarWrapper(calendarDivId, settingsJson, dotNetReference));
 }
 
 export const interop = {
-    calendarChangeDuration: (calendarDivId: string, units, amount) => {
-        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarChangeDuration(units, amount);
+    calendarChangeDuration: (calendarDivId: string, units: DurationInput) => {
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.calendarChangeDuration(units);
     },
 
     calendarSetOption: (calendarDivId: string, option, value) => {
-        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarSetOption(option, value);
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.calendarSetOption(option, value);
     },
 
-    calendarRefetchResources: (calendarDivId: string, newCalendarResourceFeed) => {
-        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarRefetchResources(newCalendarResourceFeed);
+    calendarRefetchResources: (calendarDivId: string, newCalendarResourceFeed: string) => {
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.calendarRefetchResources(newCalendarResourceFeed);
     },
 
     calendarRefetchEvents: (calendarDivId: string) => {
-        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.CalendarRefetchEvents();
+        FCWrapperInstances.get(calendarDivId).FromDotNetInterop.calendarRefetchEvents();
     },
 
-    setDotNetReference: (calendarDivId: string, dotNetReference) => {
-        FCWrapperInstances.get(calendarDivId).SetDotNetReference(dotNetReference);
+    setDotNetReference: (calendarDivId: string, dotNetReference: any) => {
+        FCWrapperInstances.get(calendarDivId).dotNetReference = dotNetReference;
     },
 }
 
-export function DeleteFCWrapperInstance(calendarDivId: string) {
+export function deleteFCWrapperInstance(calendarDivId: string) {
     FCWrapperInstances.delete(calendarDivId);
 }
+
+//setInterval(() => console.log(FCWrapperInstances), 1000);

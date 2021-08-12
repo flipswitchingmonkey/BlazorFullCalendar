@@ -5,7 +5,7 @@
 
 <h3>MonthView (Array Source)</h3>
 
-<FullCalendar settings="@calendarSettings" OnClickEvent="OnClickHandler" OnUpdateEvent="OnResizeHandler"/>
+<FullCalendar settings="@calendarSettings" OnEventClick="OnClickHandler" OnEventChange="OnResizeHandler"/>
 
 <br/>
 
@@ -16,7 +16,7 @@
 
     private void OnClickHandler(CalendarEventChangeResponse response)
     {
-        _jsRuntime.InvokeVoidAsync("alert", response.ToString());
+        _jsRuntime.InvokeVoidAsync("alert", $"Click {response.Id} {response.Title}");
     }
 
     private void OnClickHandler2(CalendarEventChangeResponse response)
@@ -26,34 +26,37 @@
 
     private void OnResizeHandler(CalendarEventChangeResponse response)
     {
-        _jsRuntime.InvokeVoidAsync("alert", "Changement !" + response.ToString());
+        var oldEvent = eventList.FirstOrDefault(e => e.Id == response.Id);
+
+        _jsRuntime.InvokeVoidAsync("alert", $"Change {response.Id} {response.Title} - New end date {response.End} - Old end date {oldEvent.End}");
+
+        oldEvent.End = response.End;
     }
 
     protected override void OnInitialized()
     {
+        eventList.AddRange(GetRandomEvents(50));
+
         calendarSettings = new CalendarSettings()
         {
             Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction, CalendarPluginTypes.Bootstrap },
             InitialView = "dayGridTwoMonths",
-            timeZone = "UTC",
+            TimeZone = "UTC",
             Editable = true,
-            headerToolbar  = new CalendarHeader()
+            HeaderToolbar  = new CalendarHeader()
             {
-                left = "title",
-                center = "",
-                right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
+                Left = "title",
+                Center = "",
+                Right = "dayGridOneWeek,dayGridTwoWeeks,dayGridTwoMonths today prev,next"
             },
-            themeSystem = "bootstrap",
-            views = new Dictionary<string, CalendarViewDefinition>()
+            ThemeSystem = "bootstrap",
+            Views = new Dictionary<string, CalendarViewDefinition>()
             {
                 { "dayGridOneWeek", CalendarViewDefinition.DayGridWeeks(1,"One Week") },
                 { "dayGridTwoWeeks", CalendarViewDefinition.DayGridWeeks(2,"Two Weeks") },
                 { "dayGridTwoMonths", CalendarViewDefinition.DayGridMonths(2,"Two Months") },
             },
-            events = GetRandomEvents(50).ToArray()
+            Events = eventList.ToArray()
         };
     }
-
-
-
 }

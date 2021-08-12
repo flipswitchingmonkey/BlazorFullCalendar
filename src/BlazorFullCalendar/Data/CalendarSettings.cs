@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using BlazorFullCalendar.Contracts;
 
 namespace BlazorFullCalendar.Data
 {
-    public class CalendarSettings
+    public class CalendarSettings : JsonSerializable
     {
-        [JsonProperty("schedulerLicenseKey")]
-        public string SchedulerLicenseKey { get; set; } = "CC-Attribution-NonCommercial-NoDerivatives";
+        //[JsonProperty("schedulerLicenseKey")]
+        //public string SchedulerLicenseKey { get; set; } = "CC-Attribution-NonCommercial-NoDerivatives";
 
         [JsonProperty("initialView")]
         public string InitialView { get; set; }
@@ -39,61 +37,91 @@ namespace BlazorFullCalendar.Data
         [JsonProperty("eventResourceEditable")]
         public bool? EventResourceEditable { get; set; }
 
-        public string themeSystem { get; set; } = "standard";
+        [JsonProperty("themeSystem")]
+        public string ThemeSystem { get; set; } = "standard";
 
         //Called when an external draggable element or an event from another calendar has 
         //been dropped onto the calendar.
-        public string drop { get; set; }
+        [JsonProperty("drop")]
+        public string Drop { get; set; }
 
         //Triggered also when existing element is dragged.
-        public string eventDrop { get; set; }
+        [JsonProperty("eventDrop")]
+        public string EventDrop { get; set; }
 
         //Triggered when event drag starts. Returns state BEFORE change!
-        public string eventDragStart { get; set; }
+        [JsonProperty("eventDragStart")]
+        public string EventDragStart { get; set; }
 
         //Triggered when event drag stops. Returns state BEFORE change!
-        public string eventDragStop { get; set; }
+        [JsonProperty("eventDragStop")]
+        public string EventDragStop { get; set; }
 
         //Triggered when event resizing finishes. Returns state AFTER change!
-        public string eventResize { get; set; }
+        [JsonProperty("eventResize")]
+        public string EventResize { get; set; }
 
         //Triggered when event resizing starts. Returns state BEFORE change!
-        public string eventResizeStart { get; set; }
+        [JsonProperty("eventResizeStart")]
+        public string EventResizeStart { get; set; }
 
         //Triggered when event resizing stops. Returns state BEFORE change!
-        public string eventResizeStop { get; set; }
+        [JsonProperty("eventResizeStop")]
+        public string EventResizeStop { get; set; }
 
-        public string eventClick { get; set; }
+        [JsonProperty("eventClick")]
+        public string EventClick { get; set; }
 
-        public string eventMouseEnter { get; set; }
+        [JsonProperty("eventMouseEnter")]
+        public string EventMouseEnter { get; set; }
 
-        public string eventMouseLeave { get; set; }
+        [JsonProperty("eventMouseLeave")]
+        public string EventMouseLeave { get; set; }
 
-        public string locale { get; set; }
-        public string timeZone { get; set; }
+        [JsonProperty("locale")]
+        public string Locale { get; set; }
+
+        [JsonProperty("timeZone")]
+        public string TimeZone { get; set; }
 
         //Sunday=0, Monday=1, Tuesday=2, etc.
-        public int firstDay { get; set; }
-        public CalendarDurationObject minTime { get; set; }
-        public CalendarDurationObject maxTime { get; set; }
-        public CalendarHeader headerToolbar { get; set; }
-        //public Dictionary<string, int> duration { get; set; }
-        public CalendarDurationObject duration { get; set; }
-        public CalendarDateFormatter[] slotLabelFormat { get; set; }
-        public CalendarDurationObject slotLabelInterval { get; set; }
-        public CalendarResourceFeed resources { get; set; }
-        public Dictionary<string, CalendarViewDefinition> views { get; set; }
-        public List<CalendarResourceColumn> resourceColumns { get; set; }
-        public List<CalendarSourceFeed> eventSources { get; set; }
-        public CalendarDateItem[] events { get; set; }
-        public CalendarEventTimeFormat eventTimeFormat { get; set; }
+        [JsonProperty("firstDay")]
+        public int FirstDay { get; set; }
 
-        public string ToJson()
-        {
-            return JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-        }
+        [JsonProperty("slotMinTime")]
+        public CalendarDurationObject SlotMinTime { get; set; }
+
+        [JsonProperty("slotMaxTime")]
+        public CalendarDurationObject SlotMaxTime { get; set; }
+
+        [JsonProperty("headerToolbar")]
+        public CalendarHeader HeaderToolbar { get; set; }
+
+        [JsonProperty("duration")]
+        public CalendarDurationObject Duration { get; set; }
+
+        [JsonProperty("slotLabelFormat")]
+        public CalendarDateFormatter[] SlotLabelFormat { get; set; }
+
+        [JsonProperty("slotLabelInterval")]
+        public CalendarDurationObject SlotLabelInterval { get; set; }
+
+        [JsonProperty("resources")]
+        public CalendarResourceFeed Resources { get; set; }
+
+        [JsonProperty("views")]
+        public Dictionary<string, CalendarViewDefinition> Views { get; set; }
+
+        [JsonProperty("resourceColumns")]
+        public List<CalendarResourceColumn> ResourceColumns { get; set; }
+
+        [JsonProperty("eventSources")]
+        public List<CalendarSourceFeed> EventSources { get; set; }
+
+        [JsonProperty("events")]
+        public CalendarDateItem[] Events { get; set; }
+
+        [JsonProperty("eventTimeFormat")]
+        public CalendarEventTimeFormat EventTimeFormat { get; set; }
     }
 }
