@@ -13,9 +13,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
+  "license": "ISC",
   "devDependencies": {
-    "@webpack-cli/generators": "^2.2.0",
     "autoprefixer": "^10.3.1",
     "css-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.2.0",
