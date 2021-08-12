@@ -37,9 +37,9 @@ namespace BlazorFullCalendar
         [Parameter] public EventCallback<CalendarEventChangeResponse> OnEventDragStart { get; set; }
         [Parameter] public EventCallback<CalendarEventChangeResponse> OnEventDragStop { get; set; }
 
+        private ElementReference _calendarDivReference;
         private CalendarInteropFeature _interop;
         private DotNetObjectReference<FullCalendar> _objRef;
-        private ElementReference _calendarDivReference;
 
         protected override void OnInitialized()
         {
@@ -47,11 +47,6 @@ namespace BlazorFullCalendar
 
             instanceNumber++;
             Id += instanceNumber.ToString();
-        }
-
-        private async Task Refetch()
-        {
-            await _interop.CalendarRefetchEventsAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -3,23 +3,25 @@
 
 @page "/interactive"
 
-<h3>MonthView (Array Source)</h3>
+<h3>Interractive View (Array Source) - First Instance</h3>
 
-<FullCalendar settings="@calendarSettings" OnEventClick="OnClickHandler" OnEventChange="OnResizeHandler"/>
+<FullCalendar settings="@_calendarSettings" OnEventClick="OnClickHandler" OnEventChange="OnResizeHandler"/>
 
 <br/>
 
-<FullCalendar settings="@calendarSettings" OnClickEvent="OnClickHandler2" OnUpdateEvent="OnResizeHandler"/>
+<h3>Interractive View (Array Source) - Second Instance</h3>
+
+<FullCalendar settings="@_calendarSettings" OnEventClick="SecondCalendarOnClickHandler" OnEventChange="OnResizeHandler"/>
 
 @code {
-    public CalendarSettings calendarSettings { get; set; }
+    private CalendarSettings _calendarSettings { get; set; }
 
     private void OnClickHandler(CalendarEventChangeResponse response)
     {
         _jsRuntime.InvokeVoidAsync("alert", $"Click {response.Id} {response.Title}");
     }
 
-    private void OnClickHandler2(CalendarEventChangeResponse response)
+    private void SecondCalendarOnClickHandler(CalendarEventChangeResponse response)
     {
         _jsRuntime.InvokeVoidAsync("alert", "22 " + response.ToString());
     }
@@ -37,7 +39,7 @@
     {
         eventList.AddRange(GetRandomEvents(50));
 
-        calendarSettings = new CalendarSettings()
+        _calendarSettings = new CalendarSettings()
         {
             Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction, CalendarPluginTypes.Bootstrap },
             InitialView = "dayGridTwoMonths",

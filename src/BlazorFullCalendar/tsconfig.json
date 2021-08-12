@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "es6",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "removeComments": true,
+    "target": "es5"
+  },
+  "files": [
+    "TypeScript/BlazorFullCalendar.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

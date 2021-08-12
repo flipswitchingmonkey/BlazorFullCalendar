@@ -2,16 +2,12 @@
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ServerSideSample.Pages
 {
     public class CalendarPageBase : ComponentBase
     {
         protected List<CalendarDateItem> eventList = new();
-
 
         public static List<CalendarDateItem> GetRandomEvents(int count, int maxHours=480, int maxEventDuration=10, bool allday=false, string label="Event")
         {

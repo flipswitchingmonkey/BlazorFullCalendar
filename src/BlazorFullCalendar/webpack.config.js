@@ -5,18 +5,16 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
-
 const stylesHandler = isProduction ? MiniCssExtractPlugin.loader : 'style-loader';
-
 
 
 const config = {
     entry: [
-        './src/index.ts'
+        './TypeScript/BlazorFullCalendar.ts'
     ],
     output: {
         /*path: path.resolve(__dirname, 'dist'),*/
-        path: path.resolve(__dirname, "../wwwroot"),
+        path: path.resolve(__dirname, "wwwroot"),
         filename: "js/BlazorFullCalendar.js",
         library: "BlazorFullCalendar",
         assetModuleFilename: 'resources/[hash][ext][query]'
