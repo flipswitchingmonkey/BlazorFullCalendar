@@ -1,16 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
 
 namespace BlazorFullCalendar.Data
 {
-    public class CalendarEventTimeFormat
+    public class CalendarEventTimeFormat : JsonSerializable
     {
-        public string hour { get; set; }
-        public string minute { get; set; }
-        public string second { get; set; }
-        public dynamic meridiem { get; set; }
-        public bool? omitZeroMinute { get; set; }
-        public bool? hour12 { get; set; }
+        [JsonProperty("hour")]
+        public string Hour { get; set; }
+
+        [JsonProperty("minute")]
+        public string Minute { get; set; }
+
+        [JsonProperty("second")]
+        public string Second { get; set; }
+
+        [JsonProperty("meridiem")]
+        public dynamic Meridiem { get; set; }
+
+        [JsonProperty("omitZeroMinute")]
+        public bool? OmitZeroMinute { get; set; }
+
+        [JsonProperty("hour12")]
+        public bool? Hour12 { get; set; }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BlazorFullCalendar.Data
+﻿namespace BlazorFullCalendar.Data
 {
     public static class CalendarPluginTypes
     {

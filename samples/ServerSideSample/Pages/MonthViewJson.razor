@@ -7,14 +7,21 @@
 <FullCalendar settings="@calendarSettings" />
 
 @code {
-    public CalendarSettings calendarSettings { get; set; }  = new CalendarSettings()
+    public CalendarSettings calendarSettings { get; set; }  = new CalendarSettings
     {
-        plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
-        defaultView = "dayGridWeek",
-        timeZone = "UTC",
-        eventSources = new List<CalendarSourceFeed>()
+        Plugins = new[] { CalendarPluginTypes.DayGrid, CalendarPluginTypes.Interaction },
+        InitialView = "dayGridWeek",
+        TimeZone = "UTC",
+        EventSources = new List<CalendarSourceFeed>()
         {
-            new CalendarSourceFeed() { url = "https://fullcalendar.io/demo-events.json", extraParams = new Dictionary<string, string>(){ { "custom","dummy"} } }
+            new CalendarSourceFeed 
+            { 
+                Url = "https://fullcalendar.io/demo-events.json", 
+                ExtraParams = new Dictionary<string, string>()
+                { 
+                    { "custom","dummy"} 
+                } 
+            }
         }
     };
 }

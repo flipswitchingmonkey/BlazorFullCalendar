@@ -1,16 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace BlazorFullCalendar.Data
 {
-    public class CalendarSourceFeed
+    public class CalendarSourceFeed : JsonSerializable
     {
-        public string url { get; set; }
-        public string method { get; set; }
-        public Dictionary<string, string> extraParams { get; set; }
-        public string color { get; set; }
-        public string textColor { get; set; }
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
+        [JsonProperty("method")]
+        public string Method { get; set; }
+
+        [JsonProperty("extraParams")]
+        public Dictionary<string, string> ExtraParams { get; set; }
+
+        [JsonProperty("color")]
+        public string Color { get; set; }
+
+        [JsonProperty("textColor")]
+        public string TextColor { get; set; }
     }
 }

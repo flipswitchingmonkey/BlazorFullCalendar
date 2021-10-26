@@ -1,53 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
 
 namespace BlazorFullCalendar.Data
 {
-    public class CalendarViewDefinition
+    public class CalendarViewDefinition : JsonSerializable
     {
-        public string type { get; set; }
-        public string buttonText { get; set; }
-        //public Dictionary<string,float> duration { get; set; }
-        public CalendarDurationObject duration { get; set; }
-        public CalendarDateFormatter[] slotLabelFormat { get; set; }
-        public CalendarDurationObject slotLabelInterval { get; set; }
-        public CalendarDateFormatter columnHeaderFormat { get; set; }
-        public bool? allDaySlot { get; set; }
-        public string allDayText { get; set; }
-        public CalendarDurationObject minTime { get; set; }
-        public CalendarDurationObject maxTime { get; set; }
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("buttonText")]
+        public string ButtonText { get; set; }
+
+        [JsonProperty("duration")]
+        public CalendarDurationObject Duration { get; set; }
+
+        [JsonProperty("slotLabelFormat")]
+        public CalendarDateFormatter[] SlotLabelFormat { get; set; }
+
+        [JsonProperty("slotLabelInterval")]
+        public CalendarDurationObject SlotLabelInterval { get; set; }
+
+        [JsonProperty("dayHeaderFormat")]
+        public CalendarDateFormatter DayHeaderFormat { get; set; }
+
+        [JsonProperty("allDaySlot")]
+        public bool? AllDaySlot { get; set; }
+
+        [JsonProperty("allDayText")]
+        public string AllDayText { get; set; }
+
+        [JsonProperty("slotMinTime")]
+        public CalendarDurationObject SlotMinTime { get; set; }
+
+        [JsonProperty("slotMaxTime")]
+        public CalendarDurationObject SlotMaxTime { get; set; }
 
         public CalendarViewDefinition() { }
 
         public CalendarViewDefinition(string viewType, string viewButtonText, CalendarDurationObject viewDuration = null,
             CalendarDateFormatter[] slotLabelFormatDefault = null, CalendarDateFormatter columnHeaderFormatDefault = null)
         {
-            type = viewType;
-            buttonText = viewButtonText;
-            duration = viewDuration;
-            slotLabelFormat = slotLabelFormatDefault;
-            columnHeaderFormat = columnHeaderFormatDefault;
+            Type = viewType;
+            ButtonText = viewButtonText;
+            Duration = viewDuration;
+            SlotLabelFormat = slotLabelFormatDefault;
+            DayHeaderFormat = columnHeaderFormatDefault;
         }
 
         public static CalendarViewDefinition DayGridWeeks(int numberOfWeeks, string label="Weeks", CalendarDateFormatter[] slotLabelFormatDefault = null, CalendarDateFormatter columnHeaderFormatDefault = null) 
             => new CalendarViewDefinition()
         {
-            type = CalendarPluginTypes.DayGrid,
-            buttonText = label,
-            duration = CalendarDurationObject.Weeks(numberOfWeeks),
-            slotLabelFormat = slotLabelFormatDefault,
-            columnHeaderFormat = columnHeaderFormatDefault
+            Type = CalendarPluginTypes.DayGrid,
+            ButtonText = label,
+            Duration = CalendarDurationObject.FromWeeks(numberOfWeeks),
+            SlotLabelFormat = slotLabelFormatDefault,
+            DayHeaderFormat = columnHeaderFormatDefault
         };
 
         public static CalendarViewDefinition DayGridMonths(int numberOfMonths, string label = "Months", CalendarDateFormatter[] slotLabelFormatDefault = null, CalendarDateFormatter columnHeaderFormatDefault = null)
             => new CalendarViewDefinition()
-            {
-                type = CalendarPluginTypes.DayGrid,
-                buttonText = label,
-                duration = CalendarDurationObject.Months(numberOfMonths),
-                slotLabelFormat = slotLabelFormatDefault,
-                columnHeaderFormat = columnHeaderFormatDefault
-            };
+        {
+            Type = CalendarPluginTypes.DayGrid,
+            ButtonText = label,
+            Duration = CalendarDurationObject.FromMonths(numberOfMonths),
+            SlotLabelFormat = slotLabelFormatDefault,
+            DayHeaderFormat = columnHeaderFormatDefault
+        };
     }
 }

@@ -4,9 +4,9 @@
 
 <FullCalendar settings=@settings
               @ref="calendar"
-              OnAddEvent="@AddEvent"
-              OnUpdateEvent="@UpdateEvent"
-              OnClickEvent="@ClickEvent" />
+              OnDrop="@AddEvent"
+              OnEventChange="@UpdateEvent"
+              OnEventClick="@ClickEvent" />
 
 @code {
     public CalendarSettings settings { get; set; }
@@ -21,74 +21,155 @@
     {
         await base.OnInitializedAsync();
 
-        DefaultSourceFeed = new CalendarSourceFeed()
+        DefaultSourceFeed = new CalendarSourceFeed
         {
-            url = "/api/Events/50",
-            method = "GET"
+            Url = "/api/Events/50",
+            Method = "GET"
         };
 
-        ProjectsSourceFeed = new CalendarSourceFeed()
+        ProjectsSourceFeed = new CalendarSourceFeed
         {
-            url = "/api/EventsAllday/10",
-            method = "GET"
+            Url = "/api/EventsAllday/10",
+            Method = "GET"
         };
 
         var dateFormatHourMinute = new CalendarDateFormatter[] {
-            new CalendarDateFormatter()
+            new CalendarDateFormatter
             {
-                hour12 = false,
-                hour = "2-digit",
-                minute = "2-digit",
-                meridiem = "false"
+                Hour12 = false,
+                Hour = "2-digit",
+                Minute = "2-digit",
+                Meridiem = "false"
             }
         };
-        var dateFormatDayMonth = new CalendarDateFormatter()
+        var dateFormatDayMonth = new CalendarDateFormatter
         {
-            month = "2-digit",
-            day = "2-digit",
-            weekday = "short"
+            Month = "2-digit",
+            Day = "2-digit",
+            Weekday = "short"
         };
 
-        settings = new CalendarSettings()
+        settings = new CalendarSettings
         {
-            plugins = new[] { "timeGrid", "dayGrid", "interaction" },
-            defaultView = "timeGrid2Weeks",
-            header = new CalendarHeader()
+            Plugins = new[] { "timeGrid", "dayGrid", "interaction" },
+            InitialView = "timeGrid2Weeks",
+            HeaderToolbar  = new CalendarHeader
             {
-                left = "prev,next today",
-                center = "title",
-                right = " timeGridDay,timeGrid4Days,timeGridWeek,timeGrid2Weeks,timeGrid4Weeks dayGridMonth,dayGridYear"
+                Left = "prev,next today",
+                Center = "title",
+                Right = "timeGridDay,timeGrid4Days,timeGridWeek,timeGrid2Weeks,timeGrid4Weeks dayGridMonth,dayGridYear"
             },
             //refetchResourcesOnNavigate = true,
-            minTime = new CalendarDurationObject() { hour = 6 },
-            maxTime = new CalendarDurationObject() { hour = 24 },
-            eventStartEditable = true,
-            eventResizableFromStart = true,
-            eventDurationEditable = true,
-            firstDay = 1,
-            locale = "de",
+            SlotMinTime = new CalendarDurationObject { Hour = 6 },
+            SlotMaxTime = new CalendarDurationObject { Hour = 24 },
+            EventStartEditable = true,
+            EventResizableFromStart = true,
+            EventDurationEditable = true,
+            FirstDay = 1,
+            Locale = "en",
             //editable = true,
             //droppable = true,
             //drop = "BlazorFullCalendar.interop.calendarOnDrop",
             //eventClick = "BlazorFullCalendar.interop.calendarOnEventClick",
             //eventDrop = "BlazorFullCalendar.interop.calendarOnEventResize",
             //eventResize = "BlazorFullCalendar.interop.calendarOnEventResize",
-            eventTimeFormat = new CalendarEventTimeFormat() { hour = "2-digit", minute = "2-digit", meridiem = false },
-            views = new Dictionary<string, CalendarViewDefinition>()
-    {
-                { "timeGrid4Days", new CalendarViewDefinition(CalendarPluginTypes.TimeGrid,"4 Days",CalendarDurationObject.Days(4), dateFormatHourMinute, dateFormatDayMonth) { allDaySlot=true, allDayText="Projects"} },
-                { "timeGridDay", new CalendarViewDefinition(CalendarPluginTypes.TimeGrid, "1 Day", CalendarDurationObject.Days(1), dateFormatHourMinute, dateFormatDayMonth) { allDaySlot=true, allDayText="Projects"}},
-                { "timeGridWeek", new CalendarViewDefinition(CalendarPluginTypes.TimeGrid, "Week", CalendarDurationObject.Weeks(1), dateFormatHourMinute, dateFormatDayMonth) { allDaySlot=true, allDayText="Projects"}},
-                { "timeGrid2Weeks", new CalendarViewDefinition(CalendarPluginTypes.TimeGrid, "2 Weeks", CalendarDurationObject.Weeks(2), dateFormatHourMinute, dateFormatDayMonth) { allDaySlot=true, allDayText="Projects"}},
-                { "timeGrid4Weeks", new CalendarViewDefinition(CalendarPluginTypes.TimeGrid, "4 Weeks", CalendarDurationObject.Weeks(4), dateFormatHourMinute, dateFormatDayMonth) { allDaySlot=true, allDayText="Projects"}},
-                { "dayGridMonth", new CalendarViewDefinition(CalendarPluginTypes.DayGrid, "Month", CalendarDurationObject.Months(1))},
-                { "dayGridYear", new CalendarViewDefinition(CalendarPluginTypes.DayGrid, "Year", CalendarDurationObject.Years(1))},
+            EventTimeFormat = new CalendarEventTimeFormat 
+            { 
+                Hour = "2-digit", 
+                Minute = "2-digit", Meridiem = false 
             },
-            eventSources = new List<CalendarSourceFeed>()
-    {
+            Views = new Dictionary<string, CalendarViewDefinition>()
+            {
+                { 
+                    "timeGrid4Days", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid,
+                        "4 Days",CalendarDurationObject.FromDays(4), 
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    )
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "timeGridDay", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid, 
+                        "1 Day", 
+                        CalendarDurationObject.FromDays(1), 
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    ) 
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "timeGridWeek", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid, 
+                        "Week", 
+                        CalendarDurationObject.FromWeeks(1),
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    ) 
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "timeGrid2Weeks", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid,
+                        "2 Weeks", 
+                        CalendarDurationObject.FromWeeks(2),
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                        ) 
+                        { 
+                            AllDaySlot=true, 
+                            AllDayText="Projects"
+                        }
+                    },
+                { 
+                    "timeGrid4Weeks", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.TimeGrid, 
+                        "4 Weeks", 
+                        CalendarDurationObject.FromWeeks(4), 
+                        dateFormatHourMinute, 
+                        dateFormatDayMonth
+                    ) 
+                    { 
+                        AllDaySlot=true, 
+                        AllDayText="Projects"
+                    }
+                },
+                { 
+                    "dayGridMonth", 
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.DayGrid,
+                        "Month", 
+                        CalendarDurationObject.FromMonths(1)
+                    )
+                },
+                { 
+                    "dayGridYear",
+                    new CalendarViewDefinition(
+                        CalendarPluginTypes.DayGrid,
+                        "Year", 
+                        CalendarDurationObject.FromYears(1)
+                    )
+                },
+            },
+            EventSources = new List<CalendarSourceFeed>()
+            {
                 DefaultSourceFeed, ProjectsSourceFeed
             },
-
         };
     }
 
