@@ -36,7 +36,7 @@
     "@fullcalendar/list": "^5.9.0",
     "@fullcalendar/timegrid": "^5.9.0",
     "bootstrap": "^4.6.0",
-    "moment": "^2.29.1"
+    "moment": "^2.29.2"
   },
   "-vs-binding": {
     "ProjectOpened": [
